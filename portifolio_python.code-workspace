@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../GitHub/SBPO_2026"
+		},
+		{
+			"name": "dispenser-medicamentos",
+			"path": "."
+		}
+	],
+	"settings": {
+		"python-envs.defaultEnvManager": "ms-python.python:system"
+	}
+}
