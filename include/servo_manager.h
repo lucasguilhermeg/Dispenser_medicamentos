@@ -1,31 +1,23 @@
 #pragma once
-#include <Arduino.h>
-#include "time.h"
+#include <ESP32Servo.h>
 
-const char* NTP_SERVER = "pool.ntp.org";
-const long  GMT_OFFSET = -3 * 3600;
-const int   DST_OFFSET = 0;
+const int SERVO_PIN       = 13;
+const int ANGULO_FECHADO  = 0;
+const int ANGULO_ABERTO   = 90;
+const int TEMPO_ABERTO_MS = 3000;
 
-void sincronizarNTP() {
-    configTime(GMT_OFFSET, DST_OFFSET, NTP_SERVER);
-    Serial.print("Sincronizando horário NTP");
+Servo servoDispenser;
 
-    struct tm timeInfo;
-    while (!getLocalTime(&timeInfo)) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println("\nHorário sincronizado!");
-    Serial.printf("Hora atual: %02d:%02d:%02d\n",
-        timeInfo.tm_hour,
-        timeInfo.tm_min,
-        timeInfo.tm_sec);
+void iniciarServo() {
+    servoDispenser.attach(SERVO_PIN);
+    servoDispenser.write(ANGULO_FECHADO);
+    Serial.println("Servo iniciado na posição fechada.");
 }
 
-void getHoraAtual(int &hora, int &minuto) {
-    struct tm timeInfo;
-    getLocalTime(&timeInfo);
-    hora   = timeInfo.tm_hour;
-    minuto = timeInfo.tm_min;
+void dispensar(int compartimento) {
+    Serial.printf("Dispensando compartimento %d...\n", compartimento);
+    servoDispenser.write(ANGULO_ABERTO);
+    delay(TEMPO_ABERTO_MS);
+    servoDispenser.write(ANGULO_FECHADO);
+    Serial.println("Compartimento fechado.");
 }

@@ -8,13 +8,13 @@
 const char* MQTT_BROKER         = "broker.hivemq.com";
 const int   MQTT_PORT           = 1883;
 const char* MQTT_TOPICO_ROTINA  = "dispenser/rotina";
-const char* MQTT_TOPICO_COMANDO = "dispenser/comando";  // novo
+const char* MQTT_TOPICO_COMANDO = "dispenser/comando";
 
 WiFiClient   espClient;
 PubSubClient mqttClient(espClient);
 
 void parsearRotina(const String& payload) {
-    StaticJsonDocument<1024> doc;
+    JsonDocument doc;
     DeserializationError erro = deserializeJson(doc, payload);
 
     if (erro) {
@@ -47,9 +47,8 @@ void parsearRotina(const String& payload) {
     }
 }
 
-// Processa comandos manuais enviados pelo celular
 void processarComando(const String& payload) {
-    StaticJsonDocument<256> doc;
+    JsonDocument doc;
     DeserializationError erro = deserializeJson(doc, payload);
 
     if (erro) {
@@ -59,7 +58,7 @@ void processarComando(const String& payload) {
     }
 
     const char* acao = doc["acao"];
-    int compartimento = doc["compartimento"] | 1; // padrão: compartimento 1
+    int compartimento = doc["compartimento"] | 1;
 
     if (strcmp(acao, "dispensar") == 0) {
         Serial.printf("Comando manual: dispensar compartimento %d\n", compartimento);
@@ -77,7 +76,6 @@ void mqttCallback(char* topico, byte* payload, unsigned int tamanho) {
 
     Serial.printf("Mensagem recebida no tópico: %s\n", topico);
 
-    // Direciona para a função correta conforme o tópico
     if (String(topico) == MQTT_TOPICO_ROTINA) {
         parsearRotina(mensagem);
     } else if (String(topico) == MQTT_TOPICO_COMANDO) {
@@ -95,11 +93,8 @@ void conectarMQTT() {
 
         if (mqttClient.connect(clientId.c_str())) {
             Serial.println(" conectado!");
-            // Assina os dois tópicos
             mqttClient.subscribe(MQTT_TOPICO_ROTINA);
             mqttClient.subscribe(MQTT_TOPICO_COMANDO);
-            Serial.printf("Inscrito em: %s\n", MQTT_TOPICO_ROTINA);
-            Serial.printf("Inscrito em: %s\n", MQTT_TOPICO_COMANDO);
         } else {
             Serial.printf(" falhou (rc=%d), tentando em 3s\n",
                 mqttClient.state());
