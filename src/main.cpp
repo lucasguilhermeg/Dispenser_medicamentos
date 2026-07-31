@@ -1,18 +1,23 @@
 #include <Arduino.h>
-
-// put function declarations here:
-int myFunction(int, int);
+#include "wifi_manager.h"
+#include "ntp_manager.h"
+#include "mqtt_manager.h"
+#include "servo_manager.h"
+#include "scheduler.h"
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    Serial.begin(115200);
+
+    conectarWiFi();
+    sincronizarNTP();
+    iniciarServo();
+    conectarMQTT();
+
+    Serial.println("\n=== Dispenser pronto ===");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+    mqttLoop();
+    verificarAlarmes();
+    delay(1000);
 }
