@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "display_manager.h"
 #include "wifi_manager.h"
 #include "ntp_manager.h"
 #include "servo_manager.h"
@@ -8,6 +9,7 @@
 void setup() {
     Serial.begin(115200);
 
+    iniciarDisplay();
     conectarWiFi();
     sincronizarNTP();
     iniciarServo();
@@ -19,5 +21,11 @@ void setup() {
 void loop() {
     mqttLoop();
     verificarAlarmes();
+
+    // Atualiza horário no display a cada segundo
+    int hora, minuto;
+    getHoraAtual(hora, minuto);
+    displayHorario(hora, minuto);
+
     delay(1000);
 }
