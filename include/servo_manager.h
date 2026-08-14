@@ -1,7 +1,7 @@
 #pragma once
 #include <ESP32Servo.h>
-#include "display_manager.h"
 #include "piezo_manager.h"
+#include "display_manager.h"
 
 const int SERVO_PIN       = 13;
 const int ANGULO_FECHADO  = 0;
@@ -19,17 +19,27 @@ void iniciarServo() {
 void dispensar(int compartimento, String nomeMed = "Medicamento") {
     Serial.printf("Dispensando compartimento %d...\n", compartimento);
 
-    // Exibe no display que está dispensando
     displayDispensando(nomeMed, compartimento);
 
-    // Abre o servo
     servoDispenser.write(ANGULO_ABERTO);
-    delay(TEMPO_ABERTO_MS);
-    servoDispenser.write(ANGULO_FECHADO);
-    Serial.println("Compartimento fechado.");
+    Serial.println("Servo aberto — aguardando queda da pilula...");
 
-    // Aguarda confirmação da queda da pílula
-    bool pilulaDetectada = aguardarPilula();
+    unsigned long inicio = millis();
+    bool pilulaDetectada = false;
+
+    while (millis() - inicio < PIEZO_TIMEOUT_MS) {
+        int leitura = analogRead(PIEZO_PIN);
+
+        if (leitura > PIEZO_THRESHOLD) {
+            pilulaDetectada = true;
+            Serial.printf("Vibração detectada! Leitura: %d\n", leitura);
+            break;
+        }
+        delay(10);
+    }
+
+    servoDispenser.write(ANGULO_FECHADO);
+    Serial.println("Servo fechado.");
 
     if (pilulaDetectada) {
         displayPilulaConfirmada(nomeMed);
@@ -39,5 +49,5 @@ void dispensar(int compartimento, String nomeMed = "Medicamento") {
         Serial.println("ALERTA: Pilula nao detectada!");
     }
 
-    delay(3000); // mantém mensagem no display por 3 segundos
+    delay(3000);
 }
