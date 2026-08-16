@@ -6,21 +6,31 @@
 #define SCREEN_WIDTH  128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET    -1
+#define OLED_ADDRESS  0x3C
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 void iniciarDisplay() {
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
-        Serial.println("Display OLED não encontrado!");
-        return;
+    Wire.begin(21, 22);
+
+    // Tenta endereço 0x3C
+    if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS)) {
+        Serial.println("Endereço 0x3C falhou, tentando 0x3D...");
+
+        // Tenta endereço 0x3D
+        if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3D)) {
+            Serial.println("Display OLED não encontrado em nenhum endereço!");
+            return;
+        }
     }
+
+    Serial.println("Display iniciado!");
     display.clearDisplay();
     display.setTextColor(SSD1306_WHITE);
     display.setTextSize(1);
     display.setCursor(0, 0);
     display.println("Dispenser pronto!");
     display.display();
-    Serial.println("Display iniciado!");
 }
 
 void displayHorario(int hora, int minuto) {
@@ -28,8 +38,8 @@ void displayHorario(int hora, int minuto) {
     sprintf(horario, "%02d:%02d", hora, minuto);
 
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setCursor(28, 10);
+    display.setTextSize(3);
+    display.setCursor(28, 20);
     display.println(horario);
 
     display.setTextSize(1);

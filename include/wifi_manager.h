@@ -1,8 +1,8 @@
 #pragma once
 #include <WiFi.h>
 
-const char* WIFI_SSID     = "DESKTOP-B7QME48 2032";
-const char* WIFI_PASSWORD = "|x01938U";
+const char* WIFI_SSID     = "";
+const char* WIFI_PASSWORD = "";
 
 void conectarWiFi() {
     Serial.println("\nConectando ao Wi-Fi...");
