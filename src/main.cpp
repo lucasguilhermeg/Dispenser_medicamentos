@@ -2,6 +2,8 @@
 #include "display_manager.h"
 #include "wifi_manager.h"
 #include "ntp_manager.h"
+#include "buzzer_manager.h"
+#include "led_manager.h"
 #include "servo_manager.h"
 #include "mqtt_manager.h"
 #include "scheduler.h"
@@ -10,6 +12,8 @@ void setup() {
     Serial.begin(115200);
 
     iniciarDisplay();
+    iniciarBuzzer();
+    iniciarLed();
     conectarWiFi();
     sincronizarNTP();
     iniciarServo();
@@ -22,7 +26,6 @@ void loop() {
     mqttLoop();
     verificarAlarmes();
 
-    // Atualiza horário no display a cada segundo
     int hora, minuto;
     getHoraAtual(hora, minuto);
     displayHorario(hora, minuto);

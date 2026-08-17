@@ -2,11 +2,12 @@
 #include <ESP32Servo.h>
 #include "piezo_manager.h"
 #include "display_manager.h"
+#include "buzzer_manager.h"
+#include "led_manager.h"
 
-const int SERVO_PIN       = 13;
-const int ANGULO_FECHADO  = 0;
-const int ANGULO_ABERTO   = 90;
-const int TEMPO_ABERTO_MS = 3000;
+const int SERVO_PIN      = 13;
+const int ANGULO_FECHADO = 0;
+const int ANGULO_ABERTO  = 90;
 
 Servo servoDispenser;
 
@@ -43,6 +44,8 @@ void dispensar(int compartimento, String nomeMed = "Medicamento") {
 
     if (pilulaDetectada) {
         displayPilulaConfirmada(nomeMed);
+        tocarBuzzer();
+        piscarLed();
         Serial.println("Pilula confirmada!");
     } else {
         displayPilulaNaoDetectada();
